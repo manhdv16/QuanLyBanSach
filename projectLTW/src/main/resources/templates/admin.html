@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+	integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+	crossorigin="anonymous">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Document</title>
+<style>
+/* Định cấu hình kích thước cửa sổ modal */
+.modal-dialog {
+	max-width: 200%;
+	/* Định cấu hình kích thước chiều rộng tối đa */
+}
+
+.modal-body {
+	max-width: 200%;
+}
+
+.modal-content {
+	width: 100%;
+	/* Định cấu hình chiều rộng của nội dung cửa sổ modal */
+}
+    .description-column {
+        height: 200px;
+    }
+</style>
+</head>
+
+<body>
+	<div class="container">
+        <h1 class="text-center mb-5 mt-4"> Quản lý Sách</h1>
+        <div class="d-flex justify-content-between align-items-center">
+			<a href="#addBookModal" id="addBookButton"
+				class="btn btn-primary text-white fw-bold" style="width: 100px;"
+				data-toggle="modal">Add Book</a>
+			<a class="btn btn-danger ml-auto"  href="/logout">Logout</a> 
+		</div>
+		<table class="table table-striped table-bordered">
+			<thead class="table-dark">
+				<tr>
+					<th>Title</th>
+					<th>Author</th>
+					<th>Category</th>
+					<th>Publication Date</th>
+					<th>Page Number</th>
+					<th>Sold</th>
+					<th>Action</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="book : ${books}">
+					<td th:text="${book.title}"></td>
+					<td th:text="${book.author}"></td>
+					<td th:text="${book.category.name}"></td>
+					<td th:text="${book.pubdate}"></td>
+					<td th:text="${book.pagenumber}"></td>
+					<td th:text="${book.sold}"></td>
+					<td>
+						<button class="btn btn-primary text-white fw-bold"
+							th:onclick="'viewBookDetails(' + ${book.book_id} + ')'"
+							data-toggle="modal" data-target="#viewBookModal">View</button>
+						<button class="btn btn-danger"
+							th:onclick="'deleteBookConfirmation(' + ${book.book_id} + ')'">Delete</button>
+
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		<!-- add book -->
+		<form class="modal fade" tabindex="-1" id="addBookModal"
+			role="dialog" enctype="multipart/form-data">
+			<div class="modal-dialog modal-lg" role="document">	
+				<div class="modal-content">
+					<h1 class="text-center mb-5 mt-4">Sách</h1>
+					<div class="modal-body">
+						<h5 id="error" class="text-center text-danger"></h5>
+						<div class="row">
+							<div class="col-lg-4">
+								<div class="form-group">
+									<label>Tiêu đề</label> <input type="text" id="title"
+										class="form-control" required>
+								</div>
+							</div>
+							<div class="col-lg-3">
+								<div class="form-group">
+									<label>Tác giả</label> <input type="text" id="author"
+										class="form-control" required>
+								</div>
+							</div>
+							<div class="col-lg-7">
+								<div class="form-group">
+									<label>Mô tả về sách</label>
+									<textarea class="form-control" id="description"
+										style="height: 200px;"></textarea>
+								</div>
+							</div>
+
+							<div class="col-lg-5">
+								<div class="form-group">
+									<div class="input-group">
+										<input id="uploadImg" onchange="getImg()" type="file"
+											class="custom-file-input"  />
+										<div class="input-group-append">
+											<button class="btn btn-outline-secondary mx-auto"
+												type="button"
+												onclick="document.getElementById('uploadImg').click()">Upload</button>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div style="width: 300px;height:300px;">
+										<img style="width: 100%; height: 100%; object-fit: contain;" id="img" src="">
+									</div>
+								</div>
+							</div>
+
+							<div class="col-lg-4">
+								<div class="form-group">
+									<label>Ngày phát hành</label> <input type="date"
+										id="publicationDate" class="form-control" required>
+								</div>
+							</div>
+							<div class="col-lg-3">
+								<div class="form-group">
+									<label>Số trang</label> <input type="number" id="pageNumber"
+										class="form-control" >
+								</div>
+
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-lg-4">
+								<div class="form-group">
+									<label>Thể loại</label>
+									<div>
+										<select class="form-control" id="categorySelection">
+											<option th:each="categories: ${Category}"
+												th:value="${categories.category_id}"
+												th:text="${categories.name}"></option>
+										</select>
+									</div>
+								</div>
+								<div class="form-group">
+									<label>Giá</label> <input type="number" id="price"
+										class="form-control" >
+								</div>
+							</div>
+
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary"
+							data-dismiss="modal">Cancel</button>
+						<button id="addBook" type="submit" class="btn btn-success">Add</button>
+					</div>
+				</div>
+			</div>
+		</form>
+
+		<!-- view book -->
+		<!-- Modal xem chi tiết sách -->
+		<form class="modal fade" tabindex="-1" id="viewBookModal"
+			role="dialog" enctype="multipart/form-data">
+			<div class="modal-dialog modal-lg" role="document">
+				<div class="modal-content">
+					<h1 class="text-center mb-5 mt-4">Sách</h1>
+					<div class="modal-body">
+						<h5 id="error" class="text-center text-danger"></h5>
+						<div class="row">
+							<div class="col-lg-4">
+								<div class="form-group">
+									<label>Tiêu đề</label> <input type="text" id="viewTitle"
+										class="form-control" readonly>
+								</div>
+							</div>
+							<div class="col-lg-3">
+								<div class="form-group">
+									<label>Tác giả</label> <input type="text" id="viewAuthor"
+										class="form-control" readonly>
+								</div>
+							</div>
+							<div class="col-lg-7 description-column">
+								<div class="form-group">
+									<label>Mô tả về sách</label>
+									<textarea class="form-control" id="viewDescription" readonly
+										style="height: 200px;"></textarea>
+								</div>
+							</div>
+
+							<div class="col-lg-5">
+								<div class="form-group">
+									<div class="input-group">
+										<input id="viewImg" onchange="getViewImg()" type="file"
+											class="custom-file-input" readonly />
+										<div class="input-group-append">
+											<button class="btn btn-outline-secondary mx-auto"
+												type="button"
+												onclick="document.getElementById('viewImg').click()"
+												disabled>Upload</button>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div style="width: 300px;height:300px;">
+										<img style="width: 100%; height: 100%; object-fit: contain;" id="image" src="">
+									</div>
+								</div>
+							</div>
+
+							<div class="col-lg-4">
+								<div class="form-group">
+									<label>Ngày phát hành</label> <input type="date"
+										id="viewPublicationDate" class="form-control" readonly>
+								</div>
+							</div>
+							<div class="col-lg-3">
+								<div class="form-group">
+									<label>Số trang</label> <input type="number"
+										id="viewPageNumber" class="form-control" readonly>
+								</div>
+
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-lg-4">
+								<div class="form-group">
+									<label>Thể loại</label>
+									<div>
+										<!-- Hiển thị tên category khi "View" -->
+										<input id="viewCategoryName" class="form-control" readonly>
+
+										<select class="form-control" id="editCategory" disabled>
+											<!-- <option id="viewFirstOption" value=""></option> -->
+											<option th:each="category: ${Category}"
+												th:value="${category.category_id}"
+												th:text="${category.name}"></option>
+										</select>
+									</div>
+								</div>
+
+								<div class="form-group">
+									<label>Giá</label> <input type="number" id="viewPrice"
+										class="form-control" readonly>
+								</div>
+							</div>
+
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-primary"
+							onclick="enableEditMode()">Edit</button>
+						<button type="button" class="btn btn-secondary"
+							data-dismiss="modal">Close</button>
+					</div>
+				</div>
+			</div>
+		</form>
+
+
+	</div>
+	<link rel="stylesheet"
+		href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css">
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script
+		src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"></script>
+
+		
+		<!-- script view edit book -->
+	<script>
+		var currentBook_id;
+		var previousCategoryName=null;
+		var previousTitle = null;
+		var previousAuthor = null;
+		var previousDescription = null;           
+        let previousImage= null;
+        var previousPublicationDate= null;
+        var previousPageNumber= 0;
+        var previousPrice= 0;
+        var imagechange=null;
+		
+		function getViewImg() {
+	        var fileInput = document.getElementById("viewImg");
+	        var imgElement = document.getElementById("image");
+	        var file = fileInput.files[0];
+	        imagechange = file;
+	        console.log("imagechangegetView: "+imagechange);
+	        var reader = new FileReader();
+	        reader.onload = function (e) {
+	            imgElement.src = e.target.result;
+	        }
+	        reader.readAsDataURL(file);
+	    }
+		
+		function viewBookDetails(book_id) {
+			currentBook_id = book_id;
+	        fetch('/get-book-details/' + book_id)
+	                .then(response => {
+	        			return response.json();				
+					 })
+	            .then(data => {
+	                // Gán thông tin sách vào	 các trường của modal "viewBookModal"
+	                document.getElementById("viewTitle").value = data.title;
+	                previousTitle = data.title;
+	                document.getElementById("viewAuthor").value = data.author;
+	                previousAuthor = data.author;
+	                document.getElementById("viewDescription").value = data.description;
+	                previousDescription= data.description;
+	                document.getElementById("image").src = "img/"+data.cover;	  	 
+	                previousImage= "img/"+data.cover;
+	                document.getElementById("viewPublicationDate").value = data.pubdate;
+	                previousPublicationDate= data.pubdate;
+	                document.getElementById("viewPageNumber").value = data.pagenumber;
+	                previousPageNumber= data.pagenumber;
+	                document.getElementById("viewCategoryName").value = data.categoryName;
+	                currentCategoryName=data.categoryName;
+	                document.getElementById("viewPrice").value = data.price;
+	                previousPrice=data.price;//note
+	                console.log(data);
+	                document.getElementById("editCategory").style.display = "none";
+	                // Hiển thị modal "viewBookModal"
+	                $('#viewBookModal').modal('show');
+	            })
+	            .catch(error => {
+	                console.error('Lỗi khi lấy thông tin sách:', error);
+	            });
+	    }
+		
+		function enableEditMode() {
+			document.getElementById("viewTitle").readOnly = false;
+			document.getElementById("viewAuthor").readOnly = false;
+			document.getElementById("viewDescription").readOnly = false;
+			document.getElementById("viewImg").disabled=false;
+			document.querySelector("#viewImg + div button").disabled = false;
+			document.getElementById("viewPublicationDate").readOnly = false;
+			document.getElementById("viewPageNumber").readOnly = false;
+			document.getElementById("viewPrice").readOnly = false;
+			document.getElementById("viewCategoryName").style.display = "none";
+				
+				
+			// Thay đổi nút Edit thành nút Save
+  			document.getElementById("editCategory").style.display = "block";
+  			//document.getElementById("viewFirstOption").innerText = currentCategoryName;
+  			
+  			document.getElementById("editCategory").disabled = false;
+  			
+			document.querySelector("#viewBookModal .modal-footer button.btn-primary").innerHTML = "Save";
+			document.querySelector("#viewBookModal .modal-footer button.btn-primary").onclick = saveChanges;
+		}
+		
+		function saveChanges() {
+			console.log("vn vô địch");
+			// Viết mã để lưu các thay đổi vào CSDL ở đây
+            const title = document.getElementById("viewTitle").value;
+			console.log(title);
+            const author = document.getElementById("viewAuthor").value;
+            const description = document.getElementById("viewDescription").value;
+
+            const publicationDate = document.getElementById("viewPublicationDate").value;
+            const pageNumber = document.getElementById("viewPageNumber").value;
+            const select = document.getElementById("editCategory");
+            const category_id = select.options[select.selectedIndex].value;
+            const category_name = select.options[select.selectedIndex].text;
+            const price = document.getElementById("viewPrice").value;
+			
+            const formData = new FormData();
+            formData.append("title", title);
+            formData.append("author", author);
+            formData.append("description", description);
+            if(imagechange !==null){
+            	formData.append("image", imagechange);
+            }else{
+            	formData.append("image", null);
+            }
+            console.log(imagechange);
+            formData.append("publicationDate", publicationDate);
+            formData.append("pageNumber", pageNumber);
+            formData.append("category_id", category_id);
+            formData.append("price",price);
+
+            fetch('/edit-book/'+ currentBook_id, {
+                method: 'PUT',
+                body: formData
+            })
+                .then((response) => {	
+                	if(response.status===200){
+                		window.location.reload();
+                		console.log("success");
+                	}
+                	return response.json();
+                })
+                .catch((error) => {
+                    console.log("lỗi khi sửa sách: ", error);
+                });
+	            
+			// Sau khi lưu thành công, bạn có thể tắt chế độ chỉnh sửa và chuyển nút Save thành nút Edit
+			document.getElementById("viewTitle").readOnly = true;
+			document.getElementById("viewAuthor").readOnly = true;
+			document.getElementById("viewDescription").readOnly = true;
+			document.getElementById("viewImg").disabled=true;
+			document.querySelector("#viewImg + div button"	).disabled = true;
+			document.getElementById("viewPublicationDate").readOnly = true;
+			document.getElementById("viewPageNumber").readOnly = true;
+			document.getElementById("viewPrice").readOnly = true;
+			
+			document.getElementById("viewCategoryName").style.display = "inline";
+  			document.getElementById("editCategory").style.display = "none";
+  			document.getElementById("editCategory").disabled = true;
+  			
+			document.querySelector("#viewBookModal .modal-footer button.btn-primary").innerHTML = "Edit";
+			document.querySelector("#viewBookModal .modal-footer button.btn-primary").onclick = enableEditMode;
+		}
+	</script>
+
+	<!-- addbook -->
+	<script>
+		function getImg() {
+	        var fileInput = document.getElementById('uploadImg');
+	        var imgElement = document.getElementById('img');
+	        var file = fileInput.files[0];
+	        var reader = new FileReader();
+	        reader.onload = function (e) {
+	            imgElement.src = e.target.result;
+	        }
+	        reader.readAsDataURL(file);
+	    }
+	
+        document.getElementById('addBook').addEventListener('click', (e) => {
+        	if (confirm('Bạn có muốn thêm sách này không?')) {
+	            e.preventDefault();
+	            const title = document.getElementById("title").value;
+	            const author = document.getElementById("author").value;
+	            const description = document.getElementById("description").value;
+	            
+	            let image= null;
+	            const imageElement = document.getElementById("uploadImg");
+	            if(imageElement && imageElement.files && imageElement.files.length>0){
+	            	image = imageElement.files[0];
+	            }
+	            const publicationDate = document.getElementById("publicationDate").value;
+	            const pageNumber = document.getElementById("pageNumber").value;
+	            const select = document.getElementById("categorySelection");
+	            const category_id = select.options[select.selectedIndex].value;
+	            const price = document.getElementById("price").value;
+	            
+	            if (title === "" || author === "" || publicationDate === "") {
+	                // Hiển thị thông báo lỗi
+	                document.getElementById("error").innerHTML = "Vui lòng điền đầy đủ thông tin.";
+	                return;
+	              }
+	            
+	            const formData = new FormData();
+	            formData.append("title", title);
+	            formData.append("author", author);
+	            formData.append("description", description);
+	            formData.append("image", image);
+	            formData.append("publicationDate", publicationDate);
+	            formData.append("pageNumber",pageNumber);
+	            formData.append("category_id", category_id);
+	            formData.append("price", price);
+	            fetch('/add-book', {
+	                method: 'POST',
+	                body: formData
+	            })
+	                .then((response) => {
+	                    if(response.status===200){
+	                    	window.location.reload();
+	                    }else{
+	                    	if (response.status === 409) {
+	                          // Sách đã tồn tại trong cơ sở dữ liệu
+	                          document.getElementById("error").innerHTML = "Sách đã tồn tại.";
+	                    	} else {
+	                            // Xử lý các lỗi khác
+	                            console.log("Lỗi khi thêm sách: " + response.statusText);
+	                        }	
+	                    }
+	                })
+	                .catch((error) => {
+	                    console.log("lỗi khi thêm sách: "+error);
+	                })
+        	}
+
+        });
+
+    </script>
+
+
+	<!-- delete  -->
+	<script>
+        function deleteBookConfirmation(book_id) {
+
+            if (confirm('Bạn có muốn xóa sách này không?')) {
+                // Gửi yêu cầu DELETE để xóa sách
+                fetch('/delete-book/' + book_id, {
+                    method: 'DELETE'
+                })
+                    .then(response => {
+                        window.location.reload(); // Tải lại trang để cập nhật danh sách sách
+                    })
+                    .catch(error => {
+                        console.error('Lỗi khi xóa sách:', error);
+                    });
+            }
+        }
+
+    </script>
+</body>
+
+</html>

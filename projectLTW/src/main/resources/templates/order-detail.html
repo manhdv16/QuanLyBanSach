@@ -1,0 +1,80 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+<meta charset="UTF-8">
+<title>Home</title>
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+</head>
+
+<body>
+	<div class="container">
+		<h1>Order Detail</h1>
+		<hr>
+		<div class="row">
+			<div class="col-md-4">
+				<h4>Thông tin khách hàng</h4>
+				<form action="/order-success" method="post">
+					<div class="form-group">
+						<label for="customer-name">Họ và tên:</label> <input type="text"
+							class="form-control" id="customer-name" name="customer_name"
+							required>
+					</div>
+					<div class="form-group">
+						<label for="customer-address">Địa chỉ:</label> <input type="text"
+							class="form-control" id="customer-address" name="address"
+							required>
+					</div>
+					<div class="form-group">
+						<label for="customer-phone">Điện thoại:</label> <input type="text"
+							class="form-control" id="customer-phone" name="phone_number"
+							required>
+					</div>
+                    <div class="form-group">
+                        <label for="payment-method">Phương thức thanh toán:</label>
+                        <select class="form-control" id="payment-method" name="payment_method" required>
+                            <option value="cash">Thanh toán khi nhận hàng</option>
+                            <option value="credit_card">Thẻ tín dụng</option>
+                            <option value="bank_transfer">Chuyển khoản ngân hàng</option>
+                        </select>
+                    </div>
+                    <input type="hidden" id="totalAmount" name="total_amount" th:value="${book.price * quantity}" />
+					<button type="submit" class="btn btn-primary">Đặt hàng</button>
+				</form>
+			</div>
+			<div class="col-md-8">
+				<h4>Chi tiết đơn hàng</h4>
+				<table class="table">
+					<thead>
+						<tr>
+							<th>Tên sách</th>
+							<th>Số lượng</th>
+							<th>Giá tiền</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td th:text="${book.title}"></td>
+							<td th:text="${quantity}"></td>
+							<td th:text="${book.price} +'₫'"></td>
+						</tr>
+					</tbody>
+					<tfoot>
+						<tr>
+							<td colspan="3" class="text-right"><strong>Tổng
+									tiền:</strong></td>
+							<td th:text="${book.price*quantity} +'₫'"></td>
+						</tr>
+					</tfoot>
+				</table>
+			</div>
+		</div>
+	</div>
+	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+	<script
+		src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+</body>
+
+</html>

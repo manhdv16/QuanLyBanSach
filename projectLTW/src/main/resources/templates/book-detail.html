@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+<meta charset="UTF-8">
+<title>Book Detail</title>
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+<style>
+body {
+	font-family: Arial, sans-serif;
+}
+
+.container {
+	padding-top: 20px;
+	padding-bottom: 20px;
+}
+
+.book-image {
+	text-align: center;
+}
+
+.book-image img {
+	max-width: 100%;
+	max-height: 400px;
+	margin-bottom: 20px;
+}
+
+.book-details {
+	padding-left: 20px;
+}
+
+.book-title {
+	font-size: 24px;
+	font-weight: bold;
+	margin-bottom: 10px;
+}
+
+.book-author {
+	font-size: 18px;
+	font-weight: bold;
+	margin-bottom: 10px;
+}
+
+.book-category {
+	font-size: 18px;
+	margin-bottom: 10px;
+}
+
+.book-description {
+	margin-bottom: 10px;
+}
+
+.book-pagenumber {
+	margin-bottom: 10px;
+}
+
+.book-pubdate {
+	margin-bottom: 10px;
+}
+
+.book-price {
+	font-size: 24px;
+	font-weight: bold;
+	margin-bottom: 10px;
+}
+
+.buy-button {
+	margin-top: 20px;
+}
+
+.review-section {
+	margin-top: 40px;
+}
+
+.review-title {
+	font-size: 24px;
+	font-weight: bold;
+	margin-bottom: 20px;
+}
+
+.review-form {
+	margin-bottom: 20px;
+}
+
+.star {
+	color: orange;
+	cursor: pointer;
+}
+.star:before {
+	content: '\2606';
+	font-size: 24px;
+}
+
+.star.checked:before {
+	content: '\2605';
+}
+
+.comment-textarea {
+	width: 100%;
+	resize: vertical;
+	margin-bottom: 10px;
+}
+
+.submit-button {
+	padding: 10px 20px;
+	background-color: #4CAF50;
+	color: white;
+	border: none;
+	cursor: pointer;
+}
+
+.review-card {
+	margin-bottom: 20px;
+	padding: 20px;
+	border: 1px solid #e6e6e6;
+	border-radius: 4px;
+}
+
+.review-rating {
+	margin-bottom: 10px;
+}
+
+.review-content {
+	margin-bottom: 0;
+}
+
+.fullname {
+	font-size: 20px;
+	font-weight: bold;
+	color: #333;
+}
+.comment{
+	font-weight: bold;
+	color: #333;
+	margin-right: 10px;
+	margin-left:  10px; 
+    display: inline-block;
+}
+.rating{
+	font-weight: bold;
+	color: #333;
+	margin-right: 10px; 
+	margin-left: 10px;
+    display: inline-block;
+}
+.background {
+    background-color: #e2dfdfec;
+    border-radius: 10px;
+}
+.review-date {
+    font-style: italic;
+    color: #999;
+    font-size: 12px;
+}
+.bold-text {
+  font-weight: bold;
+}
+
+
+</style>
+</head>
+
+<body>
+	<div class="container">
+		<div class="row">
+			<div class="col-md-6 book-image">
+				<img th:src="@{'/img/' + ${book.cover}}" alt="Book Cover"
+					height="400" width="300">
+			</div>
+			<div class="col-md-6 book-details">
+				<h1 class="book-title" th:text="${book.title}"></h1>
+				<h2 class="book-author">
+					Tác giả: <span th:text="${book.author}"></span>
+				</h2>
+				<h2 class="book-category">
+					<strong>Thể loại:</strong> <span th:text="${book.category.name}"></span>
+				</h2>
+				<p class="book-description">
+					<strong>Mô tả:</strong> <span th:text="${book.description}"></span>
+				</p>
+				<p class="book-pagenumber">
+					<strong>Số trang:</strong> <span th:text="${book.pagenumber}"></span>
+				</p>
+				<p class="book-pubdate">
+					<strong>Ngày phát hành:</strong> <span th:text="${book.pubdate}"></span>
+				</p>
+				<h2 class="book-price">
+					Giá: <span th:text="${book.price}+'đ'"></span>
+				</h2>
+				<a th:href="@{/home/buy/{book_id}(book_id=${book.book_id})}"
+					class="btn btn-primary text-white fw-bold">Mua sách</a>
+			</div>
+		</div>
+
+		<div class="review-section">
+			<h1 class="review-title">Đánh giá sách</h1>
+			<div class="review-form">
+				<div class="rating">
+					<span class="star" onclick="rateBook(1)"></span> <span class="star"
+						onclick="rateBook(2)"></span> <span class="star"
+						onclick="rateBook(3)"></span> <span class="star"
+						onclick="rateBook(4)"></span> <span class="star"
+						onclick="rateBook(5)"></span>
+				</div>
+				<textarea class="comment-textarea" rows="4"
+					placeholder="Viết nhận xét của bạn"></textarea>
+				<button class="submit-button btn btn-primary"
+					onclick="submitReview()">Gửi</button>
+			</div>
+
+			<div th:each="comment : ${comments}" class="review-card">
+				<p class="fullname" th:text="${comment.user.fullname}"></p>
+				<div class="background">
+					<div class="review-rating">
+						<span class="rating">Đánh giá: </span> 
+						<span class="star checked" th:each="i : ${#numbers.sequence(1, comment.rating)}"></span> 
+						<span class="star"	th:each="i : ${#numbers.sequence(comment.rating + 1, 5)}"
+							th:if="${comment.rating < 5}"></span>
+					</div>
+					<p class="review-content">
+						<span class="comment">Nhận xét: </span> <span th:text="${comment.content}"></span>
+					</p>
+				</div>
+				<p class="review-date" th:text="${#dates.format(comment.date, 'dd/MM/yyyy HH:mm')}"></p>
+			</div>
+			
+		</div>
+	</div>
+
+	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+	<script
+		src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+	<script>
+    function rateBook(rating) {
+      const stars = document.getElementsByClassName("star");
+      for (let i = 0; i < stars.length; i++) {
+        if (i < rating) {
+          stars[i].classList.add("checked");
+        } else {
+          stars[i].classList.remove("checked");
+        }
+      }
+    }
+
+    function submitReview() {
+      	const rating = document.getElementsByClassName("star checked").length;
+      	const comment = document.querySelector(".comment-textarea").value;
+		const formData = new FormData();
+		formData.append("rating",rating);
+		formData.append("content",comment);
+		fetch('/add-comment', {
+            method: 'POST',
+            body: formData
+        })
+            .then((response) => {
+			      console.log("Đánh giá đã được gửi thành công!");
+			      window.location.reload();
+			      // Thực hiện các xử lý bổ sung (ví dụ: hiển thị thông báo)
+		    })
+		    .catch((error) => {
+			      console.log("Đã xảy ra lỗi khi gửi đánh giá!");
+			      console.log("Lỗi khi gửi đánh giá: ", error);
+		    });
+      // Perform the necessary logic to submit the review
+    }
+  </script>
+</body>
+
+</html>

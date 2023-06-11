@@ -1,0 +1,165 @@
+<!--  
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+</head>
+
+<body>
+    <h1>Enter Quantity</h1>
+    <p><strong>Title:</strong> <span th:text="${book.title}"></span></p>
+    <p><strong>Author:</strong> <span th:text="${book.author}"></span></p>
+    <p><strong>Price:</strong> <span th:text="${book.price +'₫'}"></span></p>
+    <form th:object = "${book}" th:action="@{/order-detail/{book_id}(book_id=${book.book_id})}" method="post">
+        <div>
+            <label for="quantity">Quantity:</label>
+            <input type="number" id="quantity" name="quantity" min="1" value="1">
+        </div>
+          <input type="hidden" name="bookId" th:value="${book.bookcode}"> bỏ
+        <button type="submit">Buy Now</button>
+    </form>
+</body>
+
+</html>
+-->
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Cart</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .cart-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 0;
+        }
+
+        .cart-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .cart-item-img {
+            width: 200px;
+            height: 150px;
+            object-fit: contain;
+            margin-right: 20px;
+        }
+
+        .cart-item-info {
+            flex-grow: 1;
+        }
+
+        .cart-item-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .cart-item-price {
+            margin-top: 5px;
+            font-size: 16px;
+        }
+
+        .cart-item-quantity {
+            margin-top: 10px;
+        }
+
+        .cart-item-quantity input {
+            width: 40px;
+            padding: 5px;
+            text-align: center;
+        }
+
+        .cart-item-subtotal {
+            font-size: 18px;
+            font-weight: bold;
+            margin-left: auto;
+        }
+
+        .cart-total {
+            text-align: right;
+            margin-top: 20px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .cart-actions {
+            text-align: right;
+            margin-top: 20px;
+        }
+
+        .cart-actions button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .cart-actions button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="cart-container">
+        <h1>Giỏ hàng</h1>
+		<form th:object = "${book}" action="/order-detail" method="post">
+	        <div class="cart-item">
+	            <img class="cart-item-img" th:src="@{'/img/' + ${bookcover}}" alt="Book Cover">
+	            
+	            <div class="cart-item-info">
+	                <div class="cart-item-title" th:text="${book.title}"> </div>
+	                <div class="cart-item-price" th:text="${book.price +'₫'}"></div>
+	        
+	                <div class="cart-item-quantity">
+	                    Quantity:
+	                    <input type="number" min="1" value="1" id="quantity" name="quantity" onchange="updatePrice()">
+	                </div>
+	            </div>
+	            <div class="cart-item-subtotal"th:text="${book.price*1 +'₫'}" id="price"></div>
+	        </div>
+	
+	        <div class="cart-total">Total: <span id="total" th:text="${book.price*1 +'₫'}"></span></div>
+	
+	        <div class="cart-actions">
+	            <button type ="submit">Đặt hàng</button>
+	        </div>
+        </form>
+    </div>
+
+	<script th:inline="javascript">
+		function updatePrice() {
+			var quantity = parseInt(document.getElementById("quantity").value);
+			var price = quantity * [[${book.price}]];
+			console.log(typeof [[${book.price}]]);
+			document.getElementById("price").textContent = price + '₫';
+			document.getElementById("total").textContent = price + '₫';
+		}
+	</script>
+</body>
+
+</html>

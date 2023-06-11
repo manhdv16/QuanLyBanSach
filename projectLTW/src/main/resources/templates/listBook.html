@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+	integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+	crossorigin="anonymous">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trang chủ</title>
+<style>
+body, html {
+	height: 100%;
+	margin: 0;
+	padding: 0;
+}
+
+.scrollable-content {
+	height: 100%;
+	overflow-y: auto;
+}
+
+.container-fluid {
+	margin-left: auto;
+	margin-right: auto;
+	padding-left: 15px;
+	padding-right: 15px;
+}
+</style>
+</head>
+
+<body>
+	<div class="container-fluid scrollable-content">
+		<div>
+			<h2 class="text-center mb-5 mt-4">
+				<span th:if="${fullname != null}">Hello</span> <span
+					th:text="${fullname}"></span>
+			</h2>
+
+			<div class="row justify-content-end">
+				<div class="col-auto">
+					<a th:if="${loggedIn==null}" class="btn btn-primary" href="/login">Login</a> 
+					<a th:if="${loggedIn==null}" class="btn btn-primary" href="/register">Register</a> 
+						<a th:if="${loggedIn!=null}" class="btn btn-danger" href="/logout">Logout</a> 
+						<a th:if="${loggedIn!=null}" class="btn btn-info"
+							th:href="${loggedIn !=null && loggedIn ? '/my-orders' : '/login'}">Order List</a>
+				</div>
+			</div>
+		</div>
+		<table class="table table-striped table-bordered">
+			<thead class="table-dark">
+				<tr>
+					<th>Bìa sách</th>
+					<th>Tên sách</th>
+					<th>Tác giả</th>
+					<th>Số lượng đã bán</th>
+					<th>Action</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="book : ${books}">
+					<td><img alt="" th:src="@{'/img/'+${book.cover}}" height="120"
+						width="100"></td>
+					<td th:text="${book.title}"></td>
+					<td th:text="${book.author}"></td>
+					<td th:text="${book.sold}"></td>
+					<td><a
+						th:href="${loggedIn !=null && loggedIn ? 'home/book-detail/'+book.book_id: '/login'}"
+						class="btn btn-success">View</a> <a
+						th:href="${loggedIn !=null && loggedIn ? 'home/buy/'+book.book_id : '/login'}"
+						class="btn btn-primary text-white fw-bold">Buy</a></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</body>
+
+</html>

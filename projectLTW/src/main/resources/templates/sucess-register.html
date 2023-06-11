@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th ="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Đăng ký thành công</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #333333;
+            margin-bottom: 20px;
+        }
+
+        .success-message {
+            background-color: #dff0d8;
+            border: 1px solid #d0e9c6;
+            color: #3c763d;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+
+        .account-info {
+            background-color: #ffffff;
+            border: 1px solid #cccccc;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .info-label {
+            font-weight: bold;
+        }
+
+        .login-link {
+            color: #428bca;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Đăng ký thành công</h1>
+    
+    <div class="success-message">
+        <p>Tài khoản của bạn đã được đăng ký thành công!</p>
+    </div>
+    
+    <div class="account-info">
+        <p class="info-label">Thông tin tài khoản:</p>
+        <p>Username: <span th:text="${user.username}"></span></p>
+        <p>Password: <span th:text="${user.password}"></span></p>
+    </div>
+    
+    <a class="login-link" href="/login">Login</a>
+</body>
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Orders</title>
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.7.2/dist/css/bootstrap.min.css">
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+	integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+	crossorigin="anonymous">
+<style>
+.container {
+	margin-top: 30px;
+}
+
+h1 {
+	text-align: center;
+	margin-bottom: 30px;
+}
+
+h2 {
+	text-align: center;
+	margin-bottom: 25px;
+}
+
+table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+th, td {
+	padding: 8px;
+	text-align: left;
+}
+
+th {
+	background-color: #f2f2f2;
+}
+.smaller-button {
+    padding: 7px 20px;
+    font-size: 15px;
+}
+
+.equal-button {
+    flex: 1;
+}
+
+.button-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+</style>
+</head>
+
+<body>
+	<div class="container">
+		<h1>My Orders</h1>
+		<a class="btn btn-primary mb-3" href="/home">Back</a>
+		<table class="table" th:if="${orders != null}">
+			<thead>
+				<tr>
+					<th>STT</th>
+					<th>Name</th>
+					<th>Order Date</th>
+					<th>Total Amount</th>
+					<th>Status</th>
+					<th>Action</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each=" order, orderStat: ${orders}">
+					<td th:text="${orderStat.count}"></td>
+					<td th:text="${order.book.title}"></td>
+					<td th:text="${order.order_date}"></td>
+					<td th:text="${order.total_amount}+'₫'"></td>
+					<td>Processing</td>
+					<td>
+						<div class="button-wrapper">
+							<a th:href="${'home/book-detail/'+ order.book.book_id}"
+								class="btn btn-success smaller-button">View</a>
+							<form th:action="@{/cancel-order}" method="post"
+								onsubmit="return confirm('Bạn có muốn hủy đơn hàng này không?')">
+								<input type="hidden" name="order_id"
+									th:value="${order.order_id}" />
+								<button type="submit" class="btn btn-danger equal-button">Hủy
+									Đơn Hàng</button>
+							</form>
+						</div>
+					</td>
+
+
+				</tr>
+			</tbody>
+		</table>
+		<h2 th:unless="${orders != null}">Hiện tại bạn chưa có đơn hàng.</h2>
+	</div>
+</body>
+
+</html>
